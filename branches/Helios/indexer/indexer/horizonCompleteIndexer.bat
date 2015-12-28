@@ -1,0 +1,1 @@
+java -classpath ".;jython.jar;marc4j.jar;jtds-1.0.2.jar" org.python.util.jython horizonCompleteIndexer.py

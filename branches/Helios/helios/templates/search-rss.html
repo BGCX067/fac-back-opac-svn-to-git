@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://catalog.spl.org/rssres/xsl/rss.xsl" ?>
+<rss version="2.0"
+	xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+	<generator>Helios {{PRESENTATION.HELIOS_VERSION}}</generator>
+	<title>Search results for {{q|escape}}</title>
+	<link>{{PRESENTATION.LIBRARY_BASE_URL}}</link>
+	<description>Search results from {{PRESENTATION.LIBRARY_NAME}} on {{q|escape}}</description>
+	<opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+	<opensearch:totalResults>{{response.numFound}}</opensearch:totalResults>
+	<opensearch:startIndex>{{startNum}}</opensearch:startIndex>
+	<opensearch:Query role="request" searchTerms="{{q|escape}}" startPage="{{page}}" />
+	<atom:link rel="search" type="application/opensearchdescription+xml" href="{{PRESENTATION.HELIOS_BASE_URL}}/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/opensearchdescription.xml" />
+	
+	<language>en-US</language>
+	<lastBuildDate>{{lastBuildDate}}</lastBuildDate>
+	<ttl>720</ttl>
+	<image>
+		<title>The Seattle Public Library logo</title>
+		<url>{{PRESENTATION.LIBRARY_LOGO_URL}}</url>
+		<link>{{PRESENTATION.LIBRARY_BASE_URL}}</link>
+	</image>
+{% for docOn in response.docs %}
+	<item>
+		<pubDate>{{lastBuildDate}}</pubDate>
+		<title>{{docOn.title|escape}}</title>
+		<link>{{docOn.full_bib_url|escape}}&amp;ref=rss-search</link>
+		<guid>{{docOn.full_bib_url|escape}}</guid>
+		<description> {{docOn.title|escape}}{% if docOn.format %} ({{docOn.format}}) {% endif %}{% if docOn.author %} by {% for authorOn in docOn.author %}{{authorOn.author|escape}}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</description>
+	</item>
+{% endfor %}
+</channel>
+</rss>

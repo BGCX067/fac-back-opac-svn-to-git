@@ -1,0 +1,140 @@
+     .img-link img { border:0; }
+        .record { width: 99%; border-bottom: 1px solid #b3b9bf;  }
+		.jacket { float: left; }
+		.topbar { padding: 0 5px; border-bottom: 1px solid #b3b9bf; /*background-color: #d1e0ef;*/ margin-bottom: 5px;}
+
+        
+		.results { width: 75%; float: left; clear: right; margin-left: 3px; }
+		.author { clear: right; }
+		.logo { font-family:verdana,georgia; color: #0063dc; font-size: 120%; letter-spacing: .1em; padding-right: 10px; }
+		.logo a, .page-num a, .author a, .publisher a, .logo img  { text-decoration: none; border:none;}
+		.logo a:visited { color: #0063dc;}
+		.beta {color: #d1d1d1; vertical-align:super; font-size:70%;}
+        
+		ul { list-style: none; margin: 0; padding-left: 1.3em; text-indent: -1em; }
+        
+		.searchbutton { background-color: #d1e0ef;        border: 1px solid #47a; cursor:pointer;}
+        /* page numbering */
+		.pagination { clear:both; width:auto; margin-top: 10px; padding: 10px; }        
+        .selected-page-num { margin: 5px; }        
+		.prev-next-top { text-align: right; }
+		.prev-next { text-align: right; }
+		.page-num:hover, 
+        .prev-next a:hover { background-color: #d1e0ef; color: #fff; }
+		.page-num { margin: 2px; padding:5px 8px; border:1px solid #369;
+                        text-decoration:none; }
+        /* end page numbering */
+        
+        
+		.searchform img { vertical-align: text-bottom;} 
+        
+        
+        /* begin facet-related/sidebar options */
+        .sidebar {  width: 20%; float:left; clear:left; 
+				text-align: left !important; 
+                /*background-color: #d1e0ef;*/  font-family:arial; }
+		.facet-list { margin-bottom: 5px;}
+        .sidebar a { color: #00f; text-decoration:none; }
+        .facet-name { color: #336; }
+        .show-more { cursor:pointer; }
+        .show-more:hover { background-color: #9cc; }
+        .show-more-authors {  padding: 3px; margin-left: 1em; text-decoration:underline; color:#ccc; }
+        
+        .expand {  border: 1px solid #b3b9bf; padding: 5px; background-color: #eee; 
+                    margin-bottom: 5px; }
+		.expand a { color:red; }
+		.switch-search {
+			border: 1px solid #b3b9bf; padding: 5px; background-color: #eef; margin-bottom: 3px;
+			
+		}
+		.other-views { padding: 7px; border: 1px solid #b3b9bf; margin-bottom: 5px; }
+		.switch-search a { color: blue; }
+						
+        .bestbets { border: 1px solid #ccc;  
+					background-color: #d6e3ef;
+                    padding: 5px; 
+                    margin-bottom: 5px; 
+                    }
+		a.entire-cloud { color: blue; text-decoration: none; }
+		a.cloud-link  { color: #ccc; }
+		.switch-view { background-color: #feff5f; padding: 5px; margin-bottom: 5px;
+						border: 1px solid #9f9b6d;	
+		}
+		.switch-view a {text-decoration:none;}
+        /* background-color: #90FF6F; */
+                  
+        .narrow { margin-top: 10px; /*border: 1px solid #b3b9bf;*/ padding: 5px; }
+        .narrow > strong {/* border-bottom: 1px dotted #666; margin-bottom: 4px;*/}
+        
+		.switch-facet-view a { color: #3c366f; letter-spacing: .1em; }
+		.switch-facet-view a:hover { text-decoration:underline; }
+		
+		/* end facet-related options */
+
+        .score { color: #333; font-size: smaller; }
+        .blue { color: blue; }
+
+		/****************************************** begin grid stuff */
+		.grid-results {
+			/*border: 1px solid #ddd; */
+			padding: 5px;
+		}
+		.grid-result {
+			/*background-color: #eee; */
+			border-bottom: 1px solid #efefef;
+			width: 15em;	
+		}
+		/* end grid stuff *********************************************/
+		
+		/* begin hitmap stuff */
+		.hitmap a { text-decoration:none;}
+		.hitmap { font-family: Arial, Helvetica, sans-serif; 
+					border: 1px solid #ccc; 
+					padding: 5px;
+					/*background-color: #c0d5ea; */
+					background-color: #eee;
+					margin: 4px; }
+		.hitmap a:hover { /*border: 1px solid #936; margin: 5px; padding: 5px; background-color: #eee; opacity: 0.6;*/}					
+		.r-1 { font-size: 60%;}
+		.r-2 { font-size: 80%; }
+		.r-3 { font-size: 100%; margin: 1px;}
+		.r-4 { font-size: 110%; margin: 1px; }
+		.r-5 { font-size: 120%; margin: 1px;}
+		.r-6 { font-size: 130%; margin: 2px;}
+		.r-7 { font-size: 140%; margin: 2px;}
+		.r-8 { font-size: 150%; margin: 2px;}
+		.r-9 { font-size: 160%; font-weight: bold; margin:3px;}
+		.r-10 { font-size: 170%; font-weight: bold; margin:3px;}
+		
+		.hitmap-element { padding: 1px 3px; }
+		
+		.refine-blue { color: blue;}
+		.refine-dodgerblue { color: #1E90FF; }
+		.refine-royalblue { color: #4169e1;}
+		.refine-red { color: red; }
+		.refine-darkred { color: #8b0000; }
+		.refine-green { color: green; }
+		.refine-darkgreen { color: #0f7f1f; font-weight: bold; }
+		.refine-purple { color: purple; }
+		.refine-yellow { color: #feff5f; font-weight: bold;}
+		.refine-darkyellow { color: #cdcf19; font-weight: bold;}
+		.refine-default { color: purple;}
+		.refine-list a { font-size: .75em; font-family:Arial, Helvetica, sans-serif; }
+		.expandcloud { border:1px solid #d6e3ef; padding: 5px; background-color: #cfe7ff; margin-bottom: 5px;}
+		.expandcloud a { color: #f00; }
+		.narrowcloud {
+			border: 1px solid #ccc;
+			background-color: #eef; 
+			padding: 5px;
+			margin-bottom: 5px;
+		}
+		/* following are the mootools tooltip attrs */
+		.tool-text {
+			background-color: #fff;
+			padding: 5px;
+			border: 1px solid #222;
+		}
+		/* end hitmap stuff */
+
+
+	.holdsInfoContainer { margin: 3px 0; padding: 3px 0; }

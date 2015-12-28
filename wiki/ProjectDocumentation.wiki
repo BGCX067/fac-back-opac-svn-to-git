@@ -1,0 +1,39 @@
+﻿#summary How to get a faceted backup catalogue up and running
+#labels Phase-Deploy
+
+= Introduction =
+
+It's surprisingly easy to get fac-back-opac (FBO) up and running. 
+
+= Screencast Install =
+Watch an FBO install on Windows XP from start to finish. Note that some steps have changed since this screencast was made. To see it, [http://fac-back-opac.googlecode.com/files/fbowidowsinstall.zip download], unzip, and open fbowindowsinstall.html.
+
+= Requirements =
+  * [http://subversion.tigris.org/ Subversion] client
+  * Java JDK 1.5 or higher - *Note*: You need a JDK or SDK to run Solr, not just a JRE.
+  * [http://lucene.apache.org/solr/ Solr] - tested successfully with Solr versions 1.1 and 1.2, though a Subversion checkout of the trunk is recommended.
+  * Python - tested successfully with Python versions 2.4, 2.5, and (if you're willing to give up I18N support) 2.3
+  * [http://djangoproject.org Django] - use the Subversion trunk.
+
+= Details =
+  # Using Subversion, [http://code.google.com/p/fac-back-opac/source check out] the latest version of FBO from the repository. This will create a directory called "fac-back-opac" in your current working directory.
+  # From within the `fac-back-opac` directory, copy or symlink the following files from the `solr/conf` directory into the `solr/conf` directory in the example directory of your Solr install:
+      * `solrconfig.xml`
+      * `schema.xml`
+  # Start Solr. We use the `-Xmx512M` option to increase the memory dedicated to Solr. In the example directory of your Solr install execute the following:
+{{{
+java -Xmx512M -jar start.jar
+}}}
+  You may also want to check out the example Solr init script at `solr/solr-init`.
+  # Index your records.  It's a good idea to index in chunks of 50,000 records or less to minimize disk and memory use and to correct errors.  To index a dump of MARC records at `/home/me/marcdump.dat`, for example, run the MARC indexer like so:
+{{{
+python index.py -p lib/marc.py /home/me/marcdump.dat
+}}}
+  # You can specify the Solr URL and catalog type on the command line.  For a list of options, run `python index.py` without any arguments.  We're in the process of developing parsers for many types of records.
+  # To test the install out, switch to the "helios" directory and start the built-in Django web server. It defaults to `127.0.0.1:8000`, so it will only listen to requests from a browser running on the same machine. 
+{{{
+cd helios/
+python manage.py syncdb
+python manage.py runserver
+}}}
+  # Test the search interface by connecting to the catalog at http://127.0.0.1:8000/. Type in a search term and you should see a list of facets on the right and results in the main section. Facets can be changed in `helios/settings.py`. Templates are in `helios/templates/`, with the template for the initial search screen at `helios/templates/discovery/index.html` and the results screen at `helios/templates/discovery/search.html`. Everything is organized according to Django conventions -- see the Django docs for help.

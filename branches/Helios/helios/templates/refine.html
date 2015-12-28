@@ -1,0 +1,134 @@
+{% comment %}
+This template controls the "cloud" view option.
+
+{% endcomment %}
+{% extends "search.html" %}
+
+
+{% block title %} {{PRESENTATION.LIBRARY_NAME}}: Refine search on {{q}}{% endblock %}
+
+{% block headextra %}
+	<script src="https://catalog.spl.org/hipres/js/yui/2.2.0/yahoo-min.js" type="text/javascript"></script>
+	<script src="https://catalog.spl.org/hipres/js/yui/2.2.0/event-min.js" type="text/javascript"></script>
+	<script src="https://catalog.spl.org/hipres/js/yui/2.2.0/dom-min.js" type="text/javascript"></script>
+	<script src="https://catalog.spl.org/hipres/js/yui/2.2.0/container-min.js" type="text/javascript"></script>
+	<script>var tooltips = [];</script>
+	
+{% endblock %}
+
+{% block resultsinfo %}
+{% spaceless %}
+{% block searchinfo %}
+Showing {% if facetcloud %}{{facets.0.name}}{% endif %} cloud of <strong>{{response.numFound}}</strong> results for <a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}">{{q}}</a> ( {{response_time}} seconds.)
+{% endblock %}
+
+{% endspaceless %}
+{% endblock %} {% comment %} end resultsinfo {% endcomment %}
+
+{% block sidebar %}
+{% spaceless %}
+
+<div class="sidebar">
+		<div class="other-views">
+			<strong>Other Views</strong>
+			<br />
+			<strong><a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?{% include "niceLink.html" %}&format=normal">&laquo; Normal View</a></strong>
+			<br />
+			<a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?{% include "niceLink.html" %}&format=grid">&laquo; Grid View</a> 
+			<br />
+			{% ifequal format "list" %}
+				<a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?{% include "niceLink.html" %}&format=cloud">&laquo; Cloud View</a>
+			{% else %}
+				<a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?{% include "niceLink.html" %}&format=list">&laquo; List View</a>
+			{% endifequal %}
+		</div>	
+	
+	{% if removeLimits or facetcloud %}
+    	<div class="expand">
+		<strong>Expand Results:</strong><br />
+			<div class="remove-facet-list">
+				<ul> 
+					{% for limitOn in removeLimits %}
+						<li>
+							&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{limitOn.new_limit}}&format={{format}}'>Remove {{limitOn.label}}</a>
+						</li>
+					{% endfor %}
+					
+					{% if facetcloud %}
+					<li>
+						&middot;&nbsp;<a class="entire-cloud" href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}&format={{format}}&facetcloud=">Show Entire Cloud</a>
+					</li>
+					{% endif %}
+				
+				
+				</ul>
+			</div>
+		</div>
+		{% if removeLimits %}
+		<div class="switch-search">
+			<strong>New Search:</strong><br />
+			<div class="switch-search-list">
+				<ul>
+					{% for limitOn in removeLimits %}
+						<li>
+							&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{limitOn.term}}&index={{limitOn.index}}&sort={{currentSort}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>New search on {{limitOn.label}}</a>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% endif %}
+	{% endif %}
+	{% ifequal format "cloud" %}
+		{% if not facetcloud %}
+			<div class="narrowcloud">
+				<strong>Limit Cloud To:</strong>
+				<ul>
+					{% for facetOn in facets %}
+						<li>&middot;&nbsp;<a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}&format={{format}}&facetcloud={{facetOn.code}}">
+									<span class="{{facetOn.color}}">{{facetOn.name}}</span></a></li>
+					
+					{% endfor %}
+				</ul>
+			</div>
+		
+		{% endif %}
+	{% endifequal %}
+	
+
+	
+	
+</div>
+{% endspaceless %}
+{% endblock %}
+
+{% block sortform %}{% endblock %}
+
+{% block results %}
+{% spaceless %}
+	<div class="hitmap">
+	{% for facetOn in allfacets %}
+		{% if isIE %}
+			<span class="IELayoutBug">
+				<a id="hitmap-{{forloop.counter}}" href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?{% include "niceLink.html" %}&format=cloud">
+					<span title="{{facetOn.facetGroupLabel}} {{facetOn.facetLabel}} ({{facetOn.count}})" class="tipped hitmap-element {{facetOn.color}} r-{{facetOn.rank}}" >{{facetOn.facetLabel}}</span>
+				</a>
+			</span>
+		{% else %}
+			<a id="hitmap-{{forloop.counter}}" href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?{% include "niceLink.html" %}&format=cloud">
+				<span title="{{facetOn.facetGroupLabel}} {{facetOn.facetLabel}} ({{facetOn.count}})" class="tipped hitmap-element {{facetOn.color}} r-{{facetOn.rank}}" >{{facetOn.facetLabel}}</span>
+			</a>
+		{% endif %}
+		&middot;
+	{% endfor %}
+	</div>
+{% endspaceless %}
+
+<script>
+	var doToolTips = function() {
+		var cTips = new Tips( $$('.tipped'), {} );
+	};
+	window.onDomReady( doToolTips );
+</script>
+
+{% endblock %}

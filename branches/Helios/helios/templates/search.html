@@ -1,0 +1,289 @@
+{% extends "index.html" %}
+{% block title %}{{PRESENTATION.LIBRARY_NAME}}: Search on {{qDisplay}}{% endblock %}
+{% block headextra %}
+<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|urlencode}}&index={{currentIndex}}&limit={{currentLimit}}&sort=pubdate_desc&format=rss"></link>
+{% comment %} note that we do not use the current sort for the RSS feed -- we use the publication date 
+	TODO: make it sort by accession 
+{% endcomment %}
+
+<script>
+var doToolTips = function() {
+	var cTips = new Tips( $$('.tooltipped'), {} );
+};
+//window.onDomReady( doToolTips );
+//window.addEvent( 'domready' , doToolTips); 
+//TODO: figure out how to make tooltips work with IE -- it currently works terribly.
+</script>
+
+{% endblock %}
+
+{% block bodyonload %}{% endblock %}
+{% comment %} we do not want to do the set focus call here -- only on front screen.{% endcomment %}
+
+{% block body %}
+{% spaceless %}
+		<div class="searchform" id="basic-search">
+		<form name="s" method="GET" action = "/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search">
+			<span class="logo"><a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/"><img src="{{PRESENTATION.LIBRARY_LOGO_URL}}" /></a></span>
+			<input type="text" id="id_q" name="q" size="20" maxlength="40" value='{{qDisplay|escape}}' />
+			<select name="index" id="id_index"> 
+				{% for indexOn in indexes %}
+					<option value="{{indexOn.index}}" {% ifequal indexOn.index currentIndex %}selected="true"{% endifequal %}>{{indexOn.name}}</option>
+				{% endfor %}
+			</select>
+			<input type="submit" value="Search" id="searchbutton" class="searchbutton" />	
+			{% comment %} ADVANCED SEARCH NOT YET IMPLEMENTED {% endcomment %}
+			<!--<a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/advanced/" id="show-advanced" class="show-advanced">Advanced Search</a>-->
+		</form>
+		</div>
+{% block topbar %}		
+<div class="topbar">
+	<table width="100%">
+		<tr>
+			<td>
+				{% block resultsinfo %}
+				Results <strong>{{startNum}}-{{endNum}}</strong> of&nbsp;&nbsp;<strong>{{response.numFound}}</strong> for {{qDisplay}} ({{response_time}} seconds)	
+					{% ifequal format "normal" %}
+						[<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?{% include "niceLink.html" %}&format=grid'>Grid View</a>]
+					{% else %}
+						[<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?{% include "niceLink.html" %}&format=normal'>Normal View</a>]			
+					{% endifequal %}
+					
+					{% ifequal format "list" %}{# offer choice of cloud view if in list and vice versa #}
+						[<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?{% include "niceLink.html" %}&format=cloud'>Cloud View</a>]&nbsp;
+					
+					{% endifequal %}
+					
+					{% ifequal format "cloud" %}
+						[<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?{% include "niceLink.html" %}&format=list'>List View</a>]&nbsp;
+					{% endifequal %}
+				{% endblock %}
+			</td>
+			<td align="right" valign="center">
+				{% block sortform %}
+				<form name="sortForm"><strong>Sort by:</strong>
+					<select name="sortField" onchange="doSort()">
+						<option value='?q={{q|urlencode}}&limit={{currentLimit}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>Relevance</option>
+						{% for sortOn in sorts %}
+							<option {% if sortOn.selected %}selected="true"{% endif %} value='?q={{q|urlencode}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{sortOn.field}}_{{sortOn.direction}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>{{sortOn.name}}</option>
+						{% endfor %}
+					</select>
+				</form>
+				{% endblock %}
+			</td>
+		</tr>
+		{% block topbarextra %}
+		
+		{% endblock %}
+	</table>	
+</div>
+{% endblock %} {% comment %}topbar{% endcomment %}
+
+{% block sidebar %}
+<div class="sidebar">
+	{% if removeLimits %}
+    <div class="expand">
+		<strong>Expand Search:</strong><br />
+			<div class="remove-facet-list">
+				<ul> 
+				{% for limitOn in removeLimits %}
+					<li>
+						&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{limitOn.new_limit}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>Remove {{limitOn.label}}</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
+		</div>
+	<div class="switch-search">
+		<strong>New Search:</strong><br />
+		<div class="switch-search-list">
+			<ul>
+				{% for limitOn in removeLimits %}
+					<li>
+						&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{limitOn.term}}&index={{limitOn.index}}&sort={{currentSort}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>{{limitOn.label}}</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	{% endif %}
+    {% if bestBets %}
+    <div class="bestbets">
+        <strong>Were you searching for</strong>:
+           <div class="best-bet-list">
+            <ul>{% for betOn in bestBets %}
+                <li>
+                    &middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{betOn.facetTerm}}&index={{betOn.facetIndexCode}}{% if currentLimit %}&limit={{currentLimit}}{% endif %}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>{{betOn.facetLabel}} ({{betOn.facetIndexLabel}})</a><br />
+                </li>
+            {% endfor %}
+            </ul>
+            </div>
+    </div>
+    {% endif %}
+    
+    <div class="narrow">
+	<strong>Refine Search:</strong><br />
+	<span class="switch-facet-view">[ <a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q|urlencode}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&format=cloud'><span class="tooltipped" title="All limiting options visualized as a tag cloud">Cloud</span></a> ] [ <a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&format=list'><span title="All limiting options in a list" class="tooltipped">List</span></a> ]
+	</span>			
+	
+	<br /><br />
+	{% for facetOn in facets %}
+        {% ifequal facetOn.type "fast" %}  
+            {% if facetOn.terms %}
+                <div class="facet-list" id="facet-list-{{facetOn.code}}">
+                    <strong class="facet-name">{{facetOn.name}}</strong>
+                        <ul>
+                        {% for termOn in facetOn.terms %}
+                            <li>&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:{{termOn.term}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>
+                                {{termOn.label}}
+                            </a> ({{termOn.count}})</li>
+                        {% endfor %}
+                        {% if facetOn.has_more %}
+                            <span style="display:none;" id = "facet-list-ext-{{facetOn.code}}">
+                                {% for termOn in facetOn.extended_terms %}
+                                    <li>&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:{{termOn.term}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>
+                                        {{termOn.label}}
+                                    </a> ({{termOn.count}})</li>
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                        </ul>
+                    {% if facetOn.has_more %}
+                        <a class="show-more" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">Show More...</a>&nbsp;
+						
+						{% if facetOn.show_cloud_link %}
+						<a class="cloud-link" id="cloudlink-{{facetOn.code}}" 
+						href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q|urlencode}}&index={{currentIndex}}&limit={{currentLimit}}&format=cloud&facetcloud={{facetOn.code}}'
+						>
+						<div class="tooltipped" title="Displays all {{facetOn.name|lower}}s for this search as a visual cloud">
+							
+							//{{facetOn.name}} Cloud</div></a>
+                        {% endif %}
+						
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="facet-list" id="facet-list-{{facetOn.code}}">
+                <strong class="facet-name">{{facetOn.name}}</strong>
+                <span id="facet-list-replace-{{facetOn.code}}">
+                    <br />
+                    &nbsp;&nbsp;&nbsp;Load...
+					<!--<a style="cursor:pointer;" onclick="doFacet( '{{facetOn.code}}', 'q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}' )">Load...</a>
+					-->
+
+					
+                </span>
+				<script>
+					doFacet( '{{facetOn.code}}', 'q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}' );
+				</script>
+            </div>
+        {% endifequal %}
+            
+	{% endfor %}
+    </div> {% comment %} end class=narrow {% endcomment %}
+</div>
+{% endblock %}
+<div class="results">
+	{% block results %}
+	{% comment %}
+		{% if pagination.hasPrevious or pagination.hasNext %}
+		<div class="prev-next-top">
+			{% if pagination.hasPrevious %}
+				<span class="page-num"><a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
+			{% endif %}		
+			{% if pagination.hasNext %}
+				<span class="page-num"><a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>Next&nbsp;&raquo;</a></span>
+			{% endif %}	
+		</div>
+		{% endif %}
+	{% endcomment %}
+{% for docOn in response.docs %}
+<table class="record">
+	<tr>
+	<td>{{docOn.count}}.</td>
+	<td width="10%">
+		    {% if docOn.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{docOn.isbn_numeric}}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
+	</td>
+	<td align="left" width="80%"> 
+        {% if docOn.url and docOn.is_electronic_resource %}
+        
+            <div class="title"><a href="{{docOn.url.0}}">{{docOn.title}}</a></div>
+        {% else %}
+	    	<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
+        {% endif %}
+		<div class="author">
+			{% if docOn.author %}
+				by {% for authorOn in docOn.author %}
+                        {% if not forloop.first %}&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}
+                        <a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{authorOn.author_escaped}}&index=author_exact'>{{authorOn.author}}</a><br />         
+                    {% endfor %}
+                {% if docOn.more_authors %}
+                     <span class="show-more-authors" id="show-more-authors-{{docOn.bib_num}}">
+                     <a href="#more-authors" onclick="showMoreAuthors('{{docOn.bib_num}}')">more &raquo;</a><br /></span>
+                     <div style="display:none;" id="more-authors-{{docOn.bib_num}}">
+                        {% for authorOn in docOn.more_authors %}
+                            
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{authorOn.author_escaped}}&index=author_exact'>{{authorOn.author}}</a><br />
+                        {% endfor %}
+                     </div>
+                     
+                     
+                {% endif %}
+			{% endif %}
+		</div>
+		<div class="publisher">
+			{% comment %} 	this is taken out because publisher is not currently escaped like author is 
+							and searching on publisher is of minimal value.
+			<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q="{{docOn.publisher}}"&index=publisher'>
+			{% endcomment %}
+			
+			{{docOn.publisher}}
+			{%if docOn.pubdate %}{% if docOn.publisher %}:{% endif %}{% endif %}<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{docOn.pubdate}}&index=pubdate'>{{docOn.pubdate}}</a>
+		</div>
+        <div class="score">Score: <strong>{{docOn.score}}</strong></div>
+	</td>
+	<td align="right" width="10%">{{ docOn.format_icon_url }}</td>
+	</tr>
+</table>
+{% endfor %}
+{% endblock %} {% comment %}end results {% endcomment %}
+
+{% if pagination.hasPrevious or pagination.hasNext %}
+
+<div class="pagination">
+	<center>
+		{% if pagination.hasPrevious %}
+			<span class="prev-next"><a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>&laquo;&nbsp;Previous</a></span>
+		{% endif %}	
+		{% for pageOn in pagination.pages %}
+			{% if pageOn.selected %}
+				<span class="selected-page-num">{{pageOn.pageLabel}}</span>
+			{% else %}
+				<a class="page-num" href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pageOn.page}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}' title="results {{pageOn.start}} to {{pageOn.end}}">{{pageOn.pageLabel}}</a>
+			{% endif %}
+		{% endfor %}
+		{% if pagination.hasNext %}
+			<span class="prev-next"><a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}{% ifnotequal format "normal"%}&format={{format}}{% endifnotequal %}'>Next&nbsp;&raquo;</a></span>
+		{% endif %}
+		</center>	
+</div> {% comment %} end class=results {% endcomment %}
+
+
+{% endif %}
+
+
+
+</div>
+
+<br clear="all" />
+{% block footer %}
+<br clear="both" />
+<span class="poweredby">
+	Powered by <a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/about/">Helios</a> {{PRESENTATION.HELIOS_VERSION}}
+</span>
+<br clear="both" />
+{% endblock %}	
+{% endspaceless %}
+{% endblock %}

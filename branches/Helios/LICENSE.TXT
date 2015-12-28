@@ -1,0 +1,8 @@
+This code includes components from the following open source libraries/products:
+
+Marc4J
+Yahoo YUI
+Mootools
+Apache HttpCommons
+flup
+simplejson

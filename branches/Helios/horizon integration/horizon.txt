@@ -1,0 +1,15 @@
+# To allow item status indexing to work, you must create a table and alter a trigger in Horizon.
+# for legal reasons I cannot include the whole altered trigger. So you'll have to modify the 
+# trigger yourself. 
+# You do not have to do these steps if you just want to integrate Helios into HIP.
+ 
+
+# 1. create table
+create table helios_index_queue(bib# int)
+
+# 2. alter item_iu_trig to include the following logic.  
+
+
+ if ( select count(*) from inserted i, deleted d where i.item_status = 'i' or d.item_status = 'i' ) > 0
+    insert helios_index_queue(bib#)
+    select bib# from inserted  

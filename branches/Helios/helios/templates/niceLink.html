@@ -1,0 +1,8 @@
+{% comment %} 
+	the idea is that this creates a nice clean link for helios w/o having this logic 
+	repeated all over the place in the templates.
+{% endcomment %}
+{% spaceless %}
+q={{q|escape}}{% ifnotequal currentIndex "text" %}&index={{currentIndex}}{% endifnotequal %}{% if currentSort %}&sort={{currentSort}}{% endif %}{% if currentLimit or facetOn %}&limit={{currentLimit}}{% if facetOn %}{% if currentLimit %},,{% endif %}{{facetOn.facetGroupCode}}:{{facetOn.facetTerm}}{% endif %}{% endif %}{% if page %}{% ifnotequal page 0 %}&page={{page}}{% endifnotequal %}{% endif %}
+{% endspaceless %}
+

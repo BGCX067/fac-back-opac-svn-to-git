@@ -1,0 +1,37 @@
+{% spaceless %}
+{% for facetOn in facets %}
+    {% if facetOn.terms %}
+        <ul>
+            {% for termOn in facetOn.terms %}
+                <li>&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:{{termOn.term}}'>
+                    {{termOn.label}}
+                </a> ({{termOn.count}})</li>
+            {% endfor %}
+            
+            
+            {% if facetOn.has_more %}
+                <span style="display:none;" id = "facet-list-ext-{{facetOn.code}}">
+                    {% for termOn in facetOn.extended_terms %}
+                        <li>&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|urlencode}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:{{termOn.term}}'>
+                            {{termOn.label}}
+                        </a> ({{termOn.count}})</li>
+                    {% endfor %}
+                </span>
+            {% endif %}
+         </ul>
+         {% if facetOn.has_more %}
+               <a class="show-more" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">Show More...</a>
+			   {% if facetOn.show_cloud_link %}
+						<a class="cloud-link" id="cloudlink-{{facetOn.code}}" 
+						href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/refine/?q={{q|urlencode}}&index={{currentIndex}}&limit={{currentLimit}}&format=cloud&facetcloud={{facetOn.code}}"
+						>
+						<div title="Displays all {{facetOn.name|lower}}s for this search as a visual cloud">
+							
+							//{{facetOn.name}} Cloud</div></a>
+                {% endif %}
+         {% endif %}
+            
+    {% endif %}
+{% endfor %}
+
+{% endspaceless %}

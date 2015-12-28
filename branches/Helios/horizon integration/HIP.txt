@@ -1,0 +1,132 @@
+To integrate Helios into HIP you need to do a bunch of editing of XSL files.  I can't redistribute
+the edited XSL files without violating copyright. I am giving instructions at a very high level because I have
+had nightmare experiences trying to give detailed instructions about editing XSL files.
+
+You are going to need to first install getURL and make sure it is imported in all these pages (see accompanying
+getURL folder for instructions, etc.)
+
+At the very least you're going to need to edit summary.xsl (two places), searchresponse.xsl, and searchinput.xsl
+
+You need to make sure and replace "catalog.spl.org" with the name of the server you have Helios deployed on.
+
+Known Problems: 
+1) The embedding does not do email
+2) Add to My List does not work right (it'll say 'add to my list' even if an item is already on your list, because
+it has no way of knowing what's on your list at present or not)
+
+
+
+IN SUMMARY.XSL
+==============================
+
+We're going to set up a conditional around the XSL that builds most of the summary display. If the magic words
+are in the "filter" URL parameter then we dish the request off to Helios.  In the when test clause, replace 'basic_search'
+and 'subtab14' with the names of your subtabs which have keyword searches on them.
+
+You also need to make it supress the stuff for sending an email at the bottom of the summary screen
+
+-------------------------------
+
+<!-- links originating from helios embed have ~~helios or ~~horizon in the filter argument
+to pass them through here; the active_aspect check
+makes it so ANY searches from the front page or basic KW search screen get routed to helios. 
+
+There also need to be extensive modifications to the searchinput-beta.xsl file to control the search results
+ layout and whatnot.
+
+-->
+
+<xsl:variable name="filterOn"><xsl:value-of select="//filter" /></xsl:variable>
+<xsl:choose>
+        
+    <xsl:when test="//active_aspect = 'basic_search' or //active_aspect = 'subtab14' or contains( $filterOn, '~~horizon') or contains( $filterOn, '~~helios')">
+        
+        
+        <xsl:variable name="heliosURL">http://catalog.spl.org/catalog/embed/?</xsl:variable>
+        
+        <!-- need to figure out here whether this is a link that is HIP -> helios or helios-> helios ; 
+        we look at whether "filter" ends with ~~helios or ~~horizon 
+        The filter parameter is apparently unused by HIP, at least on the summary screen.
+        So we use it to store the limiting/sorting information (instead of trying to translate
+        back into Horizon-ese)
+        -->
+       <xsl:variable name="termOnEscaped"><xsl:value-of select="URLEncoder:encode(//searchdata/search/term)" /></xsl:variable>
+                
+        <xsl:variable name="urlToGet">
+        <xsl:choose>
+            <xsl:when test="contains( $filterOn, '~~helios')">
+                <xsl:value-of select="$heliosURL" />profile=<xsl:value-of select="//profile" />&amp;page=<xsl:value-of select="//currpage" />&amp;q=<xsl:value-of select="$termOnEscaped" />&amp;filter=<xsl:value-of select="//filter" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$heliosURL" />profile=<xsl:value-of select="//profile" />&amp;page=<xsl:value-of select="//currpage" />&amp;q=<xsl:value-of select="$termOnEscaped" />&amp;filter=<xsl:value-of select="//searchdata/search/shortcut" />~~<xsl:value-of select="//sorts/sort" />~~<xsl:value-of select="//plimit/term" />~~horizon
+            </xsl:otherwise>
+        </xsl:choose>
+        </xsl:variable>              
+        <xsl:value-of select="Utils:getURL( $urlToGet )" disable-output-escaping="yes" />
+    </xsl:when>
+    <xsl:otherwise> <!-- then we will do the default view, not Helios view -->
+
+		... all the normal stuff that builds the summary display ...
+
+    </xsl:otherwise>
+</xsl:choose>
+
+-----------------------------------------------------------------------------------------
+<!-- this goes where the multi_mylist and email_selected templates are called to build the email form at the bottom of the page.
+Again, 'basic_search' and 'subtab14' should be replaced with the names of your KW search subtabs.
+
+-->
+
+<xsl:variable name="filterOn">
+  <xsl:value-of select="//filter" /> 
+  </xsl:variable>
+ <xsl:choose>
+ <xsl:when test="//active_aspect = 'basic_search' or //active_aspect = 'subtab14' or contains( $filterOn, '~~horizon') or contains( $filterOn, '~~helios')">
+  <xsl:comment>coming soon!</xsl:comment> 
+  </xsl:when>
+ <xsl:otherwise>
+  <xsl:call-template name="multi_mylist" /> 
+  <xsl:call-template name="email_selected" /> 
+ <xsl:if test="boolean(/searchresponse/resource_request)">
+  <xsl:call-template name="resource_request" /> 
+  </xsl:if>
+  </xsl:otherwise>
+  </xsl:choose>
+
+
+=========================================
+IN SEARCHRESPONSE.XSL
+
+We need to make it serve up the javascript and CSS files used by Helios.  Of course you will also need to put these files in the hipres.war/js folder as well.
+
+-----------------------------------------
+<link>
+  <xsl:attribute name="href">/hipres/css/helios.css</xsl:attribute> 
+  <xsl:attribute name="rel">stylesheet</xsl:attribute> 
+  <xsl:attribute name="type">text/css</xsl:attribute> 
+  </link>
+ <script>
+  <xsl:attribute name="src">/hipres/js/helios.js</xsl:attribute> 
+  <xsl:attribute name="type">text/javascript</xsl:attribute> 
+  </script>
+<script>
+  <xsl:attribute name="src">/hipres/js/mootools-complete.js</xsl:attribute> 
+  <xsl:attribute name="type">text/javascript</xsl:attribute> 
+  </script>
+
+=========================================
+IN SEARCHINPUT.XSL
+
+The idea here is to make the stylesheet not build the "2342 results found for dog" part at the top of the search screen -- Helios provides this.  Again 'basic_search' and 'subtab14' should be replaced with the names of your KW search subtabs.
+-----------------------------------------
+
+<xsl:if test="not( //active_aspect = 'basic_search' or //active_aspect = 'subtab14' )"> 
+
+	... all the stuff that builds the results found piece ...
+</xsl:if>
+
+
+
+
+
+

@@ -1,0 +1,34 @@
+{% extends "refine.html" %}
+
+{% block title %} {{PRESENTATION.LIBRARY_NAME}}: All Limiting Options for {{q}}{% endblock %}
+
+{% block searchinfo %}
+Showing list of all limiting options for <a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}">{{qDisplay}}</a> ( {{response_time}} seconds.)
+{% endblock %}
+
+
+{% block results %}
+{% spaceless %}
+<div class="refine-list">
+<table>
+<tr>
+	{% for facetOn in facets|dictsort:"name" %}
+		{% if facetOn.terms %}
+		<td valign="top" style="border-right:1px solid #ccc;padding-right:2px;">
+			<strong>{{facetOn.name}}</strong>
+			<ul>
+				{% for termOn in facetOn.terms %}
+                    <li>&middot;&nbsp;<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:{{termOn.term}}'>
+                        {{termOn.label}}
+                    </a> ({{termOn.count}})</li>
+               	{% endfor %}
+
+			</ul>
+		</td>{% endif %} {# facetOn.terms #}
+	{% endfor %}
+</tr>	
+</table>
+</div>
+<br clear="all" />
+{% endspaceless %}
+{% endblock %}

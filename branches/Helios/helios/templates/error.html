@@ -1,0 +1,13 @@
+{% comment %}
+handles search errors
+{% endcomment %}
+
+{% extends "search.html" %}
+
+{% block topbar %}{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block results %}
+<h2>There was an error with your search.  The problem has been logged.  Please hit the back button
+or <a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/">try again</a>.</h2>
+{% endblock %}

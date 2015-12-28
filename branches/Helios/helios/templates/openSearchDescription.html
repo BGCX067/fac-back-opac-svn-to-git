@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+	<ShortName>{{PRESENTATION.LIBRARY_SHORT_NAME}} Web Search</ShortName>
+	<Description>Search the collections of {{PRESENTATION.LIBRARY_NAME}}</Description>
+	<Tags>{{PRESENTATION.LIBRARY_SHORT_NAME}} library catalog helios</Tags>
+	<Contact>{{PRESENTATION.LIBRARY_CONTACT}}</Contact>
+	<Url type="application/rss+xml"
+		template="{{PRESENTATION.HELIOS_BASE_URL}}/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/?q={searchTerms}&amp;page={startPage?}&amp;format=rss" />
+	<Url type="text/html"
+		template="{{PRESENTATION.HELIOS_BASE_URL}}/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/?q={searchTerms}&amp;page={startPage?}" />
+	<Query role="example" searchTerms="book" />
+	<Language>*</Language>
+</OpenSearchDescription>

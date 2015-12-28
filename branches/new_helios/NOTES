@@ -1,0 +1,12 @@
+2007-10-09 -- gsf
+
+"discovery" app should follow web search model, i.e., it's the search box and
+index, nothing else.
+
+
+2007-10-13 -- gsf
+
+Decided not to split anything out special for local modification -- local
+modifications affect too much of the code (settings, templates, urls, etc.), so
+should just the necessary files should just be modified locally.
+

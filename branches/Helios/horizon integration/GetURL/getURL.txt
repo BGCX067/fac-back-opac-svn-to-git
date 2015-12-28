@@ -1,0 +1,70 @@
+Here's how to include external content in a stylesheet:
+
+1. Download the following file: http://extranet.spl.org/code/getURL20.zip
+ 
+2. Extract the file.  Put Utils.jar in your dynix\xsl\lib directory.
+Put the getURL.properties file in your dynix\xsl directory.
+
+3.  edit each of your
+dynix\xsl\start#.bat files and add the following
+line:
+
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/Utils.jar
+
+after the other set XSL_CLASSPATH statements.  eg. start.bat,
+start2.bat, etc. look like:
+
+....
+set XSL_CLASSPATH=.
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/dynix-xsl-proc.jar
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/dynix-util.jar
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/saxon.jar
+set XSL_CLASSPATH=%XSL_CLASSPATH%;%JAVA_HOME%/jre/lib/ext/jce1_2_1.jar
+set
+XSL_CLASSPATH=%XSL_CLASSPATH%;%JAVA_HOME%/jre/lib/ext/US_export_policy.j
+ar
+set
+XSL_CLASSPATH=%XSL_CLASSPATH%;%JAVA_HOME%/jre/lib/ext/sunjce-provider.ja
+r
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/jboss.jar
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/jboss-j2ee.jar
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/log4j.jar
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/jboss-common-client.jar
+
+REM begin SPL custom
+set XSL_CLASSPATH=%XSL_CLASSPATH%;./lib/Utils.jar
+REM end SPL custom
+
+for %%i in ("%_HOME_DIR%\lib\*.jar") do set
+XSL_CLASSPATH=%XSL_CLASSPATH%; 
+.... etc.
+
+After you have done this, restart all your XSL processors and make sure they come up OK.
+
+4. edit the XSL file you want to include external content in:
+
+a. Change the xsl declaration at the top from:
+	
+	<xsl:stylesheet version="1.0"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	
+	to
+	
+	<xsl:stylesheet version="1.0"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:Utils="/org.spl.utils.Utils" exclude-result-prefixes="Utils">
+
+b. AT the place in the HTML you want to include the external content,
+have the following:
+
+  <xsl:value-of select="Utils:getURL($theURL)" /> 
+
+(where $theURL is the external URL you want to include, for instance, a
+servlet that goes and grabs some piece of data from Sybase and process
+it, ie.
+
+<xsl:variable
+name="theURL">http://localhost/getSomething?bib=<xsl:value-of
+select="//bibkey" /></xsl:variable>
+<xsl:value-of select="Utils:getURL($theURL)" />
+)

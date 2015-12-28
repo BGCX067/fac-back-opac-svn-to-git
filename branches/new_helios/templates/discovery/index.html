@@ -1,0 +1,47 @@
+{% load i18n %}
+{% extends 'base.html' %}
+
+{% block title %}{% trans 'University Libraries' %}{% endblock %}
+
+{% block extrahead %}
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/discovery.css"/>
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/discovery.js"></script>
+  <script type="text/javascript">
+    window.onload = setFocus;
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="simpleSearch">
+    <div>
+      <img src="{{ MEDIA_URL }}images/logo.png" alt="University Libraries"/>
+    </div>
+    <div class="searchForm">
+      <form name="s" method="GET" action = "{{ BASE_URL }}/search/">
+        <p>
+          <input type="text" id="id_term" name="q" size="30"/>
+          <input type="submit" value="{% trans 'Search' %}" class="searchButton" />
+        </p>
+      </form>
+    </div>
+  </div>
+
+<!--
+<table>
+			<tr><td><strong>Search</strong>:</td><td><input type="text" id="id_term" name="q" size="20" maxlength="40" value="" /> </td></tr>
+			<tr><td><strong>Library</strong>:</td><td><select id="libraryselect" size="3" name="limit">
+				<option selected value="">All libraries</option>
+				<option value="location:ALGO*">Algoma</option>
+				<option value="location:DESM*">Desmarais</option>
+				<option value="location:EDUC*">Education</option>
+				<option value="location:HUNT*">Huntington</option>
+				<option value="location:MEDB*">Mining Environment Database</option>
+				<option value="location:NOSM*">Northern Ontario School of Medicine</option>
+				<option value="location:HRST*">Universite de Hearst</option>
+				<option value="location:SUDB*">University of Sudbury</option>
+				<option value="location:FALC*">Xstrata Falconbridge</option>
+			</select></td>
+</table>
+-->
+{% endblock %}
+

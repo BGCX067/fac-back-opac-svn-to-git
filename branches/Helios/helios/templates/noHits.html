@@ -1,0 +1,37 @@
+{% extends "search.html" %}
+
+
+{% block sidebar %}{% endblock %}
+
+{% block topbar %}
+<div class="topbar"></div>
+{% endblock %}
+
+
+
+{% block results %}
+
+{% if spelling_suggestions %}
+<div class="term-suggest">
+	<span class="red">Did you mean:</span> 
+	{% for suggestionOn in spelling_suggestions %}
+		{% if not forloop.first %}<br />{% endif %}
+		<a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{suggestionOn}}&spellcheck=1">{{suggestionOn}}</a>
+	{% endfor %}
+</div>
+<br />
+<br />
+{% endif %}
+
+Your search on <strong>{{qDisplay}}</strong> didn't retrieve any results.  <br />
+<br />
+Suggestions:
+<ul class="nohits">
+	<li>Make sure all words are spelled correctly.</li>
+	<li>Try other search terms.</li>
+	<li>Try your search at other libraries using <a href="http://worldcat.org/search?qt=worldcat_org&q={{qDisplay|escape}}&submit=Search">Worldcat</a></li>
+	<li><a href="http://www.spl.org/default.asp?pageID=info_ask">Ask a Librarian</a></li>
+	<li>Use an <a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{q|escape}}&sort=pubdate_desc&format=rss">RSS feed</a> to be notified when the library gets materials matching your search.</li>
+</ul>
+
+{% endblock %}

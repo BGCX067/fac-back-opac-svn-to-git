@@ -1,0 +1,37 @@
+{% extends "search.html" %}
+{% block headextra %}
+	<script type="text/javascript" src="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/js/vocab.js"></script>
+
+
+{% endblock %}
+{% block body %}
+{% spaceless %}		
+		<div id="advanced-search">
+			<span class="logo"><a href="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/"><img src="{{PRESENTATION.LIBRARY_LOGO_URL}}" /></a></span>
+			<form name="as" method="GET" action="/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/advancedsearch">
+				<!--<strong>AND</strong>&nbsp;--> 
+				<h2 id="advancedsearchlabel">Advanced Search</h2>
+
+				<select name="arg1_index">
+					{% comment %}1. Regular Index Options{% endcomment %}
+					
+					{% for indexOn in indexes %}
+						<option value="{{indexOn.index}}" {% ifequal indexOn.index currentIndex %}selected="true"{% endifequal %}>{{indexOn.name}}</option>
+					{% endfor %}
+					
+					
+					
+					{% comment %}2. Controlled vocabulary index options{% endcomment %}
+					
+					
+					{% comment %}3. Date-based index options{% endcomment %}
+					
+					
+				</select>
+				&nbsp;<strong>CONTAINS</strong>&nbsp;				
+				<input type="text" id="arg1_term" size="20" maxlength="40" value="" />
+				
+			</form>	
+		</div>
+{% endspaceless %}
+{% endblock %}

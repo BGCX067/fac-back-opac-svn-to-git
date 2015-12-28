@@ -1,0 +1,152 @@
+{% comment %}This template is used by the HIP embedding feature.  It is not meant
+to be standalone, though it is very similar in layout to the standard search.html template.  
+It requires certain JS and CSS files to be called in the page
+that this view is embedded inside of.{% endcomment %}
+
+{% spaceless %}
+
+<div class="topbar">
+	<table width="100%">
+		<tr>
+			<td>
+				Results <strong>{{startNum}}-{{endNum}}</strong> of <strong>{{response.numFound}}</strong> for <strong>{{qDisplay}}</strong> ({{response_time}} seconds)
+				
+			</td>
+			<td align="right" valign="center">
+				<form name="sortForm">
+					<strong>Sort by:</strong>
+					<select name="sortField" onchange="doSort()">
+						<option value='?profile={{profile}}&index=.GW&active_aspect=basic_search&term={{q}}&filter={{currentIndex}}~~~~{{currentLimit}}~~helios'>Relevance</option>
+						{% for sortOn in sorts %}
+							<option {% if sortOn.selected %}selected="true"{% endif %} value='?profile={{profile}}&index=.GW&active_aspect=basic_search&term={{q}}&filter={{currentIndex}}~~{{sortOn.field}}_{{sortOn.direction}}~~{{currentLimit}}~~helios'>{{sortOn.name}}</option>
+						{% endfor %}
+					</select>
+				</form>
+				
+				
+			</td>
+		</tr>
+		
+	</table>
+</div>
+<br clear="both" />
+<!--<hr color="#4477aa" size="1" />-->
+
+
+<div class="sidebar">
+	{% if removeLimits %}
+	<div class="expand">
+		<strong>Expand Search:</strong><br />
+		<div class="remove-facet-list">
+			<ul>
+				{% for limitOn in removeLimits %}
+					<li>
+						&middot;&nbsp;<a href='/ipac20/ipac.jsp?profile={{profile}}&index={{hipindex}}&active_aspect=basic_search&term={{q}}&filter={{currentIndex}}~~{{currentSortEscaped}}~~{{limitOn.new_limit}}~~helios'>Remove {{limitOn.label}}</a>
+					</li>	
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="switch-search">
+		<strong>New Search:</strong>
+		<ul>
+			{% for limitOn in removeLimits %}
+				<li>
+					&middot;&nbsp;<a href="/ipac20/ipac.jsp?profile={{profile}}&index={{hipindex}}&active_aspect=basic_search&term={{limitOn.term}}&filter={{limitOn.index}}~~{{currentSortEscaped}}~~~~helios">New search on {{limitOn.label}}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+	{% endif %}
+	
+	{% if bestBets %}
+		<div class="bestbets">
+			<strong>Were you searching for</strong>:
+				<div class="best-bet-list">
+					<ul>
+						{% for betOn in bestBets %}
+							 <li>&middot;&nbsp;<a href='/ipac20/ipac.jsp?profile={{profile}}&index=.GW&active_aspect=basic_search&term={{betOn.facetTerm}}&filter={{betOn.facetIndexCode}}~~{{currentSortEscaped}}~~{{currentLimit}}~~helios'>{{betOn.facetLabel}} ({{betOn.facetIndexLabel}})</a></li>
+						{% endfor %}
+						
+					</ul>	
+					
+				</div>
+		
+		
+		</div>
+	{% endif %}
+	<div class="narrow">
+		<strong>Refine Search:</strong><br />
+		
+		{% for facetOn in facets %}
+			{% if facetOn.terms %}
+				<div class="facet-list" id="facet-list-{{facetOn.code}}">
+					<strong class="facet-name">{{facetOn.name}}</strong>
+						<ul>
+							{% for termOn in facetOn.terms %}
+								<li>&middot;&nbsp;<a href="/ipac20/ipac.jsp?profile={{profile}}&index=.GW&active_aspect=basic_search&term={{q}}&filter={{currentIndex}}~~{{currentSortEscaped}}~~{{currentLimit}}{%if currentLimit %},,{% endif %}{{facetOn.code}}--{{termOn.term}}~~helios">{{termOn.label}}</a> ({{termOn.count}})
+								</li>
+							{% endfor %}
+							{% if facetOn.has_more %}
+								<span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
+									{% for termOn in facetOn.extended_terms %}
+										<li>&middot;&nbsp;<a href="/ipac20/ipac.jsp?profile={{profile}}&index=.GW&active_aspect=basic_search&term={{q}}&filter={{currentIndex}}~~{{currentSortEscaped}}~~{{currentLimit}}{%if currentLimit %},,{% endif %}{{facetOn.code}}--{{termOn.term}}~~helios">{{termOn.label}}</a> ({{termOn.count}})
+										</li>										
+									{% endfor %}
+								</span>
+							{% endif %}
+						</ul>
+						{% if facetOn.has_more %}
+							<a class="show-more" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">Show More...</a>
+						
+						{% endif %}
+				</div>
+			
+			
+			{% endif %}
+		{% endfor %}
+	</div>
+	
+</div> {% comment %} end sidebar {% endcomment %}
+
+<div class="results">
+	{% for docOn in response.docs %}
+		{% include "embedBriefDisplay.html" %}
+	{% endfor %}
+
+	{% if pagination.hasPrevious or pagination.hasNext %}
+		<div class="pagination">
+			<center>
+				{% if pagination.hasPrevious %}
+					<span class="prev-next">
+						<a href='/ipac20/ipac.jsp?profile={{profile}}&index={{hipindex}}&active_aspect=basic_search&term={{q}}&page={{pagination.previousPage}}&filter={{currentIndex}}~~{{currentSortEscaped}}~~{{currentLimit}}~~helios' title="previous results page">&laquo;&nbsp;Previous</a>
+					</span>
+				{% endif %}
+				{% for pageOn in pagination.pages %}
+					{% if pageOn.selected %}
+						<span class="selected-page-num">{{pageOn.pageLabel}}</span>
+					{% else %}
+						<a class='page-num' href='/ipac20/ipac.jsp?profile={{profile}}&index={{hipindex}}&active_aspect=basic_search&term={{q}}&page={{pageOn.page}}&filter={{currentIndex}}~~{{currentSortEscaped}}~~{{currentLimit}}~~helios' title="results {{pageOn.start}} to {{pageOn.end}}">{{pageOn.pageLabel}}</a>
+					{% endif %}
+				
+				{% endfor %}
+				{% if pagination.hasNext %}
+					<span class="prev-next">
+						<a href='/ipac20/ipac.jsp?profile={{profile}}&index={{hipindex}}&active_aspect=basic_search&term={{q}}&page={{pagination.nextPage}}&filter={{currentIndex}}~~{{currentSortEscaped}}~~{{currentLimit}}~~helios' title="next results page">Next&nbsp;&raquo;</a>
+					</span>
+				
+				{% endif %}
+			</center>
+			<span class="rss" style="float:right;clear:right;"><img src="https://catalog.spl.org/hipres/images/feed-icon32x32.png" /></span>
+				
+		</div>
+
+	{% endif %}
+	
+	
+	
+</div> {% comment %} end class=results {% endcomment %}
+
+
+<br clear="both" />
+{% endspaceless %}

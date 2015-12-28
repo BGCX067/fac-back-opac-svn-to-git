@@ -1,0 +1,64 @@
+{% extends "search.html" %}
+
+{% block bodyonload %}onload="checkNoImageAvailable();"{% endblock %}
+
+{% block results %}
+{% spaceless %}
+	{% comment %} TODO: prev/next navigation @ top of screen {% endcomment %}
+
+
+	<table class="grid-results">
+	{% for rowOn in response.rows %}
+		<tr>
+			{% for docOn in rowOn %}
+				<td width="25%" class="grid-result" class="tooltipped">
+					<table>
+						<tr><td > {% comment %} was height="120px;" {% endcomment %}
+							<center>
+								
+								{% if docOn.isbn_numeric %}{% comment %} TODO: make this only if the item is a book? {% endcomment %}
+									{% ifequal docOn.format "Book" %}
+									<!--<img src="http://images.amazon.com/images/P/{{docOn.isbn_numeric}}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />-->
+										<a class="img-link" href="{{docOn.full_bib_url}}"><img class="cover" src="https://syndetics.com/index.aspx?type=xw12&isbn={{docOn.isbn_numeric}}/SC.GIF&client=sepup" title="cover for {{docOn.title}}" /></a>
+									{% else %} {% comment %}has an ISBN but most non-books with ISBNs do NOT have cover art from syndetics{% endcomment %}
+										{{ docOn.format_icon_url }}
+									{% endifequal %}
+								{% else %}
+									{{ docOn.format_icon_url }}
+								{% endif %}
+								{% comment %} <!--TODO: decide what to do with this idea! -->
+									{% if docOn.summary %}
+										<span class="tooltipped" title="{{docOn.summary.0}}">Summary</span><br />
+									{% endif %}
+								{% endcomment %}
+							</center>
+						</td></tr>
+						<tr><td > {% comment %}was height="100px;" {% endcomment %}
+							 {% if docOn.url and docOn.is_electronic_resource %}
+					            <div class="title"><a href="{{docOn.url.0}}">{{docOn.title|truncatewords:"20"}}</a></div>
+					        {% else %}
+						    	<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title|truncatewords:"20"}}</a></div>
+					        {% endif %}
+
+							{% if docOn.author %}
+								<div class="author">by&nbsp;
+									{% for authorOn in docOn.author %}
+										<a href='/{{PRESENTATION.HELIOS_DEPLOY_PATH}}/search/?q={{authorOn.author_escaped}}&index=author_exact'>{{authorOn.author}}</a>{% if not forloop.last %}, {% endif %} 
+									{% endfor %}
+								</div>
+							{% endif %}
+							
+						</td>
+						</tr>
+						
+						
+					</table>
+				</td>
+			
+			{% endfor %}
+			
+		</tr>
+	{% endfor %}
+	</table>
+{% endspaceless %}
+{% endblock %}

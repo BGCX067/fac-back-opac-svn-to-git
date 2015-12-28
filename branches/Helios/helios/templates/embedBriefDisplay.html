@@ -1,0 +1,82 @@
+{% spaceless %}
+<table class="record">
+	<tr>
+		<td>{{docOn.count}}</td>
+		<td width="10%">
+			{% if docOn.isbn_numeric %}
+				{% if PRESENTATION.LIBRARY_SYNDETICS_ID %}
+					<img src="https://syndetics.com/index.aspx?type=xw12&isbn={{docOn.isbn_numeric}}/SC.GIF&client={{PRESENTATION.LIBRARY_SYNDETICS_ID}}" />
+				
+				{% else %}
+					<img src="http://images.amazon.com/images/P/{{docOn.isbn_numeric}}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />
+				{% endif %}
+			
+			
+			{% endif %}
+		</td>
+		<td align="left" width="80%">
+	       {% if docOn.url and docOn.is_electronic_resource %}
+	            <div class="title"><a href="{{docOn.url.0}}">{{docOn.title}}</a></div>
+	        {% else %}
+		    	<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
+	        {% endif %}
+			<div class="author">
+			{% if docOn.author %}
+				by {% for authorOn in docOn.author %}
+                        {% if not forloop.first %}&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}
+						<em><a href='/ipac20/ipac.jsp?profile={{profile}}&index={{embeddedConfig.HORIZON_AUTHOR_SEARCH_INDEX}}&active_aspect=basic_search&term={{authorOn.author_escaped}}&filter=author~~{{currentSortEscaped}}~~{{currentLimit}}~~helios'>{{authorOn.author}}</a></em>
+						<br />         
+                    {% endfor %}
+                {% if docOn.more_authors %}
+                     <span class="show-more-authors" id="show-more-authors-{{docOn.bib_num}}">
+                     <a href="#more-authors" onclick="showMoreAuthors('{{docOn.bib_num}}')">more &raquo;</a><br /></span>
+                     <div style="display:none;" id="more-authors-{{docOn.bib_num}}">
+                        {% for authorOn in docOn.more_authors %}
+                            
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <em><a href='/ipac20/ipac.jsp?profile={{profile}}&index={{embeddedConfig.HORIZON_AUTHOR_SEARCH_INDEX}}&active_aspect=basic_search&term={{authorOn.author_escaped}}&filter=author~~{{currentSortEscaped}}~~{{currentLimit}}~~helios'>{{authorOn.author}}</a></em>
+							<br />
+                        {% endfor %}
+                     </div>
+                     
+                 
+                {% endif %}
+			{% endif %}
+			</div>
+			<div class="publisher"> {% comment %}TODO: make these hyperlinked{% endcomment %}
+				{{docOn.publisher}}{%if docOn.pubdate %}{% if docOn.publisher %}:{% endif %}{% endif %}{{docOn.pubdate}}
+			</div>
+			
+			{% if docOn.holdsInfoHTML %}
+				<div class="holdsInfoContainer">
+					<a href="{{docOn.full_bib_url}}">{{docOn.holdsInfoHTML}}</a>
+				</div>
+			{% endif %}
+			
+		</td>
+		<td width="10%" align="right">
+			<table>
+				<tr><td colspan="2">{{docOn.format_icon_url}}</td></tr>
+				<tr>
+					<td>
+						<input class="bluebutton" type="button" value="Add to My List" alt="Add to My List" name="bkey{{docOn.bib_num}}" onclick="javascript:updatebooklist(this);" />
+							<img name="bkey{{docOn.bib_num}}" width="1" height="1" src="/hipres/images/spacer.gif" alt="Add to My List" border="0">
+						
+					</td>
+					
+					<td>
+						{% if docOn.is_requestable %}
+							<input class="bluebutton" type="button" name="request" value="Place Hold" alt="Place Hold" onclick="javascript:requestcopy('{{docOn.bib_num}}', 'full=3100001~!{{docOn.bib_num}}~!{{forloop.counter0}}');" />
+						{% endif %}
+					</td>					
+				</tr>
+				
+			</table>	
+			
+			
+			
+		</td>
+	</tr>
+</table>
+
+{% endspaceless %}
